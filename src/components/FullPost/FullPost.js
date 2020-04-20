@@ -8,28 +8,38 @@ const FullPost = ({ id }) => {
 
   useEffect(() => {
     if (id) {
-      if (!loadedPost || (loadedPost && loadedPost.id !== id))
-        axios
-          .get("https://jsonplaceholder.typicode.com/posts/" + id)
-          .then(response => {
-            console.log(response);
-            setLoadedPost(response.data);
-          });
+      if (!loadedPost || (loadedPost && loadedPost.id !== id)) {
+        const fetchData = async () => {
+          let res = await axios.get("/posts/" + id);
+          const { data } = res;
+          setLoadedPost(data);
+        };
+        fetchData();
+      }
     }
-  }, []);
+  }, [id]);
+
+  const deletePostHandler = async () => {
+    const deleteData = await axios.delete("/posts/" + id);
+    console.log(deleteData);
+  };
 
   let post = (
     <p style={{ textAlign: "center" }}>Please select a Post!</p>
   );
   if (id) {
-    <p style={{ textAlign: "center" }}>Please select a Post!</p>;
-  } else if (loadedPost) {
+    post = <p style={{ textAlign: "center" }}>Loading...</p>;
+  }
+
+  if (loadedPost) {
     post = (
       <div className="FullPost">
         <h1>{loadedPost.title}</h1>
         <p>{loadedPost.body}</p>
         <div className="Edit">
-          <button className="Delete">Delete</button>
+          <button onClick={deletePostHandler} className="Delete">
+            Delete
+          </button>
         </div>
       </div>
     );
